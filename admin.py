@@ -4,11 +4,14 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
+
 from keyboards import admin_main_menu, user_main_menu, cancel_kb
 from database import (
     add_tadbir, get_murojaatlar, get_all_users,
-    get_qatnashuvchilar, get_tadbirlar,
-    add_kengash_azosi, get_kengash_azolari, delete_kengash_azosi
+    get_qatnashuvchilar, get_tadbirlar, delete_tadbir,
+    add_kengash_azosi, get_kengash_azolari, delete_kengash_azosi,
+    add_elon, get_elonlar, delete_elon
+)
 )
 from config import ADMIN_IDS
 
@@ -394,5 +397,94 @@ async def ochirish_confirm(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         f"✅ ID {azo_id} li a'zo o'chirildi.",
+        reply_markup=admin_main_menu()
+    )
+# ===== TADBIR O'CHIRISH =====
+
+class TadbirOchirishState(StatesGroup):
+    tadbir_id = State()
+
+
+@router.message(F.text == "🗑 Tadbir o'chirish")
+async def tadbir_ochirish_start(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        return
+
+    tadbirlar = get_tadbirlar()
+    if not tadbirlar:
+        await message.answer("📅 Hozircha tadbir yo'q.", reply_markup=admin_main_menu())
+        return
+
+    text = "🗑 <b>O'chirish uchun tadbir ID sini kiriting:</b>\n\n"
+    for t in tadbirlar:
+        text += f"🔹 ID: <b>{t['id']}</b> — {t['nomi']} ({t['sana']})\n"
+
+    await state.set_state(TadbirOchirishState.tadbir_id)
+    await message.answer(text, reply_markup=cancel_kb(), parse_mode="HTML")
+
+
+@router.message(TadbirOchirishState.tadbir_id)
+async def tadbir_ochirish_confirm(message: Message, state: FSMContext):
+    if message.text == "❌ Bekor qilish":
+        await state.clear()
+        await message.answer("Bekor qilindi.", reply_markup=admin_main_menu())
+        return
+
+    try:
+        tadbir_id = int(message.text)
+    except ValueError:
+        await message.answer("❌ Iltimos raqam kiriting.")
+        return
+
+    delete_tadbir(tadbir_id)
+    await state.clear()
+    await message.answer(
+        f"✅ ID {tadbir_id} li tadbir o'chirildi.",
+        reply_markup=admin_main_menu()
+    )
+
+
+# ===== E'LON O'CHIRISH =====
+
+class ElonOchirishState(StatesGroup):
+    elon_id = State()
+
+
+@router.message(F.text == "🗑 E'lon o'chirish")
+async def elon_ochirish_start(message: Message, state: FSMContext):
+    if not is_admin(message.from_user.id):
+        return
+
+    elonlar = get_elonlar()
+    if not elonlar:
+        await message.answer("📢 Hozircha e'lon yo'q.", reply_markup=admin_main_menu())
+        return
+
+    text = "🗑 <b>O'chirish uchun e'lon ID sini kiriting:</b>\n\n"
+    for e in elonlar[-10:]:  # oxirgi 10 ta
+        preview = e['text'][:50] + "..." if len(e['text']) > 50 else e['text']
+        text += f"🔹 ID: <b>{e['id']}</b> — {preview}\n📅 {e['date']}\n\n"
+
+    await state.set_state(ElonOchirishState.elon_id)
+    await message.answer(text, reply_markup=cancel_kb(), parse_mode="HTML")
+
+
+@router.message(ElonOchirishState.elon_id)
+async def elon_ochirish_confirm(message: Message, state: FSMContext):
+    if message.text == "❌ Bekor qilish":
+        await state.clear()
+        await message.answer("Bekor qilindi.", reply_markup=admin_main_menu())
+        return
+
+    try:
+        elon_id = int(message.text)
+    except ValueError:
+        await message.answer("❌ Iltimos raqam kiriting.")
+        return
+
+    delete_elon(elon_id)
+    await state.clear()
+    await message.answer(
+        f"✅ ID {elon_id} li e'lon o'chirildi.",
         reply_markup=admin_main_menu()
     )
