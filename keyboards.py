@@ -19,6 +19,9 @@ def admin_main_menu():
         [KeyboardButton(text="📨 Murojaatlar"), KeyboardButton(text="🙋 Qatnashuvchilar")],
         [KeyboardButton(text="➕ Kengash a'zosi qo'shish"), KeyboardButton(text="🗑 A'zoni o'chirish")],
         [KeyboardButton(text="👥 Foydalanuvchilar"), KeyboardButton(text="🔙 Foydalanuvchi menyusi")]
+        # Mavjud tugmalar yoniga qo'sh:
+        [KeyboardButton(text="🗑 Tadbir o'chirish")],
+        [KeyboardButton(text="🗑 E'lon o'chirish")],
     ], resize_keyboard=True)
     return kb
 
