@@ -231,8 +231,8 @@ async def kengash(message: Message):
 async def haqimizda(message: Message):
     await message.answer(
         "🎓 <b>Yoshlar Ittifoqi haqida</b>\n\n"
-        "Biz universiteti talabalari hayotini yanada mazmunli qilish uchun ishlaydi.\n\n"
+        "Biz universitet talabalari hayotini yanada mazmunli qilish uchun ishlaymiz.\n\n"
         "🎯 Maqsadimiz: Yoshlarni birlashtirish, rivojlantirish va qo'llab-quvvatlash.\n\n"
-        "📞 Bog'lanish: @yoshlar_admin",
+        "📞 Bog'lanish: @ElbekYR",
         parse_mode="HTML"
     )
