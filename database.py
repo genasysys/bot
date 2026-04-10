@@ -151,5 +151,27 @@ def delete_kengash_azosi(azosi_id):
     db = load_db()
     db["kengash_azolari"] = [
         a for a in db.get("kengash_azolari", []) if a["id"] != azosi_id
+# ===== E'LONLAR =====
+def add_elon(text, admin_id):
+    db = load_db()
+    if "elanlar" not in db:
+        db["elanlar"] = []
+    db["elanlar"].append({
+        "id": len(db["elanlar"]) + 1,
+        "text": text,
+        "admin_id": admin_id,
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M")
+    })
+    save_db(db)
+
+def get_elonlar():
+    db = load_db()
+    return db.get("elanlar", [])
+
+def delete_elon(elon_id):
+    db = load_db()
+    db["elonlar"] = [e for e in db.get("elonlar", []) if e["id"] != elon_id]
+    save_db(db)
+        
     ]
     save_db(db)
